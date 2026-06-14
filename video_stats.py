@@ -28,6 +28,7 @@ def get_playlist_id():
         raise e
     
 def get_video_id(playlist_id):
+
     video_ids = []
     max_results = 50
     page_token = None
@@ -64,7 +65,58 @@ def get_video_id(playlist_id):
     except requests.exceptions.Request as e:
             raise e
 
+
+
+def get_video_data(video_ids):
+
+    extracted_data = []
+    batch_size = 50
+    batch_count = 0
+    def batch_list(video_id_lst, batch_size):
+          for video in range(0, len(video_id_lst), batch_size):
+               yield video_id_lst[video : video+batch_size]
+    try:
+        for batch in batch_list(video_ids, batch_size):  
+            video_id_str = ",".join(batch)
+            
+            batch_count += 1
+
+            URL = f"https://youtube.googleapis.com/youtube/v3/videos?part=contentDetails&part=Snippet&part=Statistics&id={video_id_str}&key={API_KEY}"
+
+            response = requests.get(URL)
+
+            data = response.json()
+
+            for item in data.get('items', []):
+                
+                video_id = item['id']
+                snippet = item['snippet']
+                content_details = item['contentDetails']
+                statistics = item['statistics']
+
+                video_data = {
+                    "video_id": video_id,
+                    "published_at": snippet['publishedAt'],
+                    "title": snippet['title'],
+                    "duration": content_details['duration'],
+                    "view_count": statistics.get('viewCount', None),
+                    "like_count": statistics.get('likeCount', None),
+                    "comment_count": statistics.get('commentCount', None),
+                }
+                extracted_data.append(video_data)
+            logger.info(f"Data extracted for Batch: {batch_count}")
+
+        return extracted_data
+        
+    except requests.exceptions.RequestException as e:
+         raise e
+
 if __name__ == "__main__":
-    logger.info("Getting PlaylistID")
+    logger.info("Getting PlaylistID...")
     playlist_id = get_playlist_id()
-    get_video_id(playlist_id)
+
+    logger.info("Getting Video IDs...")
+    video_ids = get_video_id(playlist_id)
+
+    logger.info("Getting Video Data...")
+    get_video_data(video_ids)

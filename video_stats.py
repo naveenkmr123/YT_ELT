@@ -2,6 +2,8 @@ import requests
 from loguru import logger
 import os
 from dotenv import load_dotenv
+from datetime import date
+import json
 
 load_dotenv()
 
@@ -111,6 +113,12 @@ def get_video_data(video_ids):
     except requests.exceptions.RequestException as e:
          raise e
 
+def save_to_json(extracted_data):
+    file_path = f"./data/YT_ELT_{date.today()}.json"
+
+    with open(file_path, "w", encoding="utf-8") as json_outfile:
+         json.dump(extracted_data, json_outfile, indent=4, ensure_ascii=False)
+         
 if __name__ == "__main__":
     logger.info("Getting PlaylistID...")
     playlist_id = get_playlist_id()
@@ -119,4 +127,7 @@ if __name__ == "__main__":
     video_ids = get_video_id(playlist_id)
 
     logger.info("Getting Video Data...")
-    get_video_data(video_ids)
+    video_data = get_video_data(video_ids)
+
+    logger.info("Saving Into a File...")
+    save_to_json(video_data)

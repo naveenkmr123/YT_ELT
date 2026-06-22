@@ -1,15 +1,14 @@
 import requests
 from loguru import logger
-import os
-from dotenv import load_dotenv
 from datetime import date
 import json
+from airflow.decorators import task
+from airflow.models import Variable
 
-load_dotenv()
+API_KEY = Variable.get("API_KEY")
+CHANNEL = Variable.get("CHANNEL_HANDLE")
 
-API_KEY = os.getenv("API_KEY")
-CHANNEL = "MrBeast2"
-
+@task
 def get_playlist_id():
 
     try:
@@ -28,7 +27,8 @@ def get_playlist_id():
     
     except Exception as e:
         raise e
-    
+
+@task
 def get_video_id(playlist_id):
 
     video_ids = []
@@ -68,7 +68,7 @@ def get_video_id(playlist_id):
             raise e
 
 
-
+@task
 def get_video_data(video_ids):
 
     extracted_data = []
@@ -113,6 +113,7 @@ def get_video_data(video_ids):
     except requests.exceptions.RequestException as e:
          raise e
 
+@task
 def save_to_json(extracted_data):
     file_path = f"./data/YT_ELT_{date.today()}.json"
 

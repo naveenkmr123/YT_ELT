@@ -70,11 +70,10 @@ def update_rows(conn, cur, schema_name, row):
                 UPDATE {schema_name}.{table_name} 
                 SET
                   "video_title" = %(title)s,
-                  "upload_date" = %(published_at)s,
                   "duration" = %(duration)s,
                   "view_count" = %(view_count)s,
                   "like_count" = %(like_count)s,
-                  "comment_count = %(commnet_count)s"
+                  "comment_count" = %(comment_count)s
                 WHERE "video_id" = %(video_id)s 
                 AND "upload_date" = %(published_at)s;
             """
@@ -83,15 +82,14 @@ def update_rows(conn, cur, schema_name, row):
         update_sql = f"""
                 UPDATE {schema_name}.{table_name} 
                 SET
-                  "video_title" = %(title)s,
-                  "upload_date" = %(published_at)s,
+                  "video_title" = %(video_title)s,
                   "duration" = %(duration)s,
                   "video_type" = %(video_type)s,
                   "view_count" = %(view_count)s,
                   "like_count" = %(like_count)s,
-                  "comment_count = %(commnet_count)s"
+                  "comment_count" = %(comment_count)s
                 WHERE "video_id" = %(video_id)s 
-                AND "upload_date" = %(published_at)s;
+                AND "upload_date" = %(upload_date)s;
             """
     
     try:

@@ -1,0 +1,8 @@
+checks for yt_api:
+  - missing_count("video_id") = 0
+  - duplicate_count("video_id") = 0
+  
+  - comment_count_greater_than_views = 0:
+      name: check for comment count greater than video views
+      comment_count_greater_than_views query: |
+        select count(*) from yt_api where "comment_count" > "view_count"
